@@ -1,0 +1,11 @@
+Setup
+/init       scan the repo,write your first calude.md
+/memory     view and edist what calude remembers
+/usage      how much of your plan you'have burned
+/help       every command.righ in the terminal
+
+Context     control what it know now
+/clear      wipe the slate between tasks
+/component  squeeze the history , keep the thread
+/context    see what's eating the windwow
+/btw        side question, leave no trace
