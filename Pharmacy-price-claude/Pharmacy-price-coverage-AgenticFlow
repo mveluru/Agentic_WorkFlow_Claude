@@ -1,0 +1,329 @@
+User
+  ↓
+Claude / Orchestrator
+  │
+  ├── Instructions
+  │     "Current/member-specific → API"
+  │     "Policy/explanation → RAG"
+  │
+  ├── Skills
+  │     Coverage workflow
+  │     Pharmacy search workflow
+  │     Policy explanation workflow
+  │
+  ├── Tools
+  │     Coverage API
+  │     Pricing API
+  │     Pharmacy API
+  │     Rules Engine
+  │     Vector/RAG search
+  │
+  └── Memory / State
+        Current member/request context
+        Completed steps
+        Tool results
+        Workflow progress
+
+  1. Instructions define the agent's behavior
+
+  You first give Claude persistent operating rules.
+  In a coding-agent environment, this can be represented by project instructions such as a CLAUDE.md;
+  in an API application, the equivalent belongs in your system/developer instructions.
+  For example:
+
+  You are a pharmacy benefits assistant.
+
+  Routing rules:
+
+  1. Current member-specific information → authoritative API.
+  2. Pricing → Pricing API.
+  3. Coverage → Coverage API.
+  4. DAW and plan rules → Rules Engine.
+  5. Policy explanations → Knowledge Base / RAG.
+  6. Never infer missing coverage or pricing.
+  7. Never execute a tool without authorization.
+  8. If an authoritative service is unavailable, report that
+     information as unavailable rather than estimating it.
+
+  This gives the agent its operating policy.
+
+  Anthropic's current guidance recommends explicit instructions for agentic systems and tool use rather than expecting the model to infer your workflow.
+
+  2. Skills define reusable workflows
+
+  A skill is better thought of as a reusable procedure rather than memory.
+
+  For example, you could conceptually have:
+
+  skills/
+     coverage-check/
+     pharmacy-search/
+     drug-alternative/
+     policy-explanation/
+
+  Your coverage-check skill might tell the agent:
+
+  Coverage Check Workflow
+
+  1. Identify member.
+  2. Identify drug.
+  3. Validate required inputs.
+  4. Call Coverage API.
+  5. Call Rules Engine when necessary.
+  6. Never determine coverage from RAG.
+  7. Return structured coverage result.
+
+  Then another skill:
+
+  Pharmacy Recommendation Workflow
+
+  1. Determine member location.
+  2. Identify medication.
+  3. Call Pharmacy API.
+  4. Filter in-network pharmacies.
+  5. Identify preferred pharmacies.
+  6. Call Pricing API.
+  7. Rank eligible options.
+  8. Explain results.
+
+  This prevents you from stuffing every procedure into one enormous system prompt.
+
+  3. Tools actually perform actions
+
+  Skills don't replace APIs.
+
+  The skill tells Claude how to perform a task.
+
+  Tools let Claude perform the task.
+
+  For example:
+
+  getCoverage(memberId, drugId)
+
+  getDrugInformation(drugId)
+
+  evaluatePlanRules(memberId, drugId)
+
+  findPharmacies(memberId, location)
+
+  getPrice(memberId, drugId, pharmacyId)
+
+  searchKnowledgeBase(query, metadata)
+
+  Claude might reason:
+
+  Question:
+  "Is Lipitor covered and where should I fill it?"
+
+  Need:
+  coverage
+  drug alternative
+  pharmacy
+  price
+
+  Execute:
+  getDrugInformation()
+          ↓
+  getCoverage()
+          ↓
+  evaluatePlanRules()
+          ↓
+  findPharmacies()
+          ↓
+  getPrice()
+          ↓
+  synthesize answer
+
+                   Orchestrator
+                        │
+          ┌─────────────┼─────────────┐
+          ↓             ↓             ↓
+   Coverage Agent   Pharmacy Agent   Policy Agent
+          │             │             │
+   Coverage API     Pharmacy API       RAG
+   Rules Engine     Pricing API     Knowledge Base
+          │             │             │
+          └─────────────┼─────────────┘
+                        ↓
+                   Final response
+
+  Think of it as 4 separate files/components, each with one job. Here’s a very simple pharmacy example.
+
+  1. Claude Instructions — “What rules should I always follow?”
+
+  For example, your main instruction file could say:
+
+  # Pharmacy Benefits Assistant
+
+  You are an AI assistant that helps members understand
+  pharmacy benefits.
+
+  Rules:
+  1. Never determine member coverage yourself.
+  2. For current coverage, call the Coverage API.
+  3. For current pricing, call the Pricing API.
+  4. For DAW and plan rules, call the Rules Engine.
+  5. For policy explanations, search the Knowledge Base.
+  6. Never invent missing coverage or pricing.
+  7. If an API fails, clearly state that the information
+     is currently unavailable.
+  8. Never expose PHI unless the user is authorized.
+
+  This is essentially the agent's operating manual.
+
+  2. Skill — “How do I perform a specific workflow?”
+
+  For example, create a Find Best Pharmacy skill:
+
+  # Skill: Find Best Pharmacy
+
+  Purpose:
+  Help a member find an appropriate pharmacy for a drug.
+
+  Steps:
+
+  1. Identify the requested drug.
+  2. Call getDrugInformation().
+  3. Call getCoverage().
+  4. Call evaluatePlanRules().
+  5. Call findNearbyPharmacies().
+  6. Remove out-of-network pharmacies.
+  7. Identify preferred pharmacies.
+  8. Call getPrice() for eligible pharmacies.
+  9. Compare the returned prices.
+  10. Return the pharmacy options and explain the result.
+
+  Important:
+  - Never estimate a price.
+  - Never determine coverage from RAG.
+  - If pricing fails, return the available pharmacy
+    information and state that pricing is unavailable.
+
+  So the instruction says what Claude should generally do.
+
+  The skill says how Claude should complete this particular task.
+
+  3. Tool — “What can Claude actually call?”
+
+  Then define the actual tools/API contracts.
+
+  For example:
+
+  Tool Name:
+  getCoverage
+
+  Purpose:
+  Retrieve current member-specific drug coverage.
+
+  Inputs:
+  - memberId
+  - drugId
+
+  Output:
+  - covered
+  - tier
+  - priorAuthorization
+  - genericRequired
+
+  Rules:
+  - Requires authenticated member.
+  - Never call without member authorization.
+  - Treat this API as the source of truth for coverage.
+
+  Another one:
+
+  Tool Name:
+  getPrice
+
+  Purpose:
+  Get the member's current estimated drug price.
+
+  Inputs:
+  - memberId
+  - drugId
+  - pharmacyId
+
+  Output:
+  - estimatedPrice
+  - pharmacyId
+  - timestamp
+
+  Rules:
+  - Pricing API is authoritative.
+  - Never replace missing prices with an LLM estimate.
+
+  In actual implementation, these descriptions become tool schemas, and your backend maps the tool call to your REST API/Lambda/service.
+
+  4. Memory / State — “What has already happened?”
+
+  Suppose the member says:
+
+  “Is Lipitor covered and where should I get it?”
+
+  As Claude works through the skill, you maintain state such as:
+
+  {
+    "memberId": "M123",
+    "drug": {
+      "name": "Lipitor",
+      "drugId": "D456",
+      "generic": "atorvastatin"
+    },
+    "coverage": {
+      "checked": true,
+      "covered": true,
+      "genericRequired": true
+    },
+    "rules": {
+      "checked": true
+    },
+    "pharmacySearch": {
+      "completed": true,
+      "pharmaciesFound": 4
+    },
+    "pricing": {
+      "completed": false
+    },
+    "currentStep": "GET_PRICING"
+  }
+
+  Now if the workflow continues, Claude doesn't need to redo everything.
+
+  It knows:
+
+  Drug lookup       ✓
+  Coverage          ✓
+  Rules             ✓
+  Pharmacy search   ✓
+  Pricing           ← CURRENT STEP
+  Final response    ○
+
+  That's state.
+
+  Long-term memory is slightly different. You might persist useful information across sessions, but you should be very careful about what you store—especially in a healthcare/PHI environment.
+
+  Put all four together
+                CLAUDE
+                   │
+         ┌─────────┴─────────┐
+         │                   │
+   Instructions            Skill
+   "Follow these          "Follow these
+    rules"                 steps"
+         │                   │
+         └─────────┬─────────┘
+                   ↓
+                 Tools
+         ┌─────────┼──────────┐
+         ↓         ↓          ↓
+     Coverage   Pricing    Pharmacy
+       API        API        API
+                   │
+                   ↓
+             Memory / State
+         "What have I already
+              completed?"
+
+  For an interview, the easiest way to remember the distinction is:
+
+  Instructions = rules. Skills = procedures. Tools = capabilities. Memory/state = progress and context.
