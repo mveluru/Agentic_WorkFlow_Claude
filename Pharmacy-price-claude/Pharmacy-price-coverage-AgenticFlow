@@ -327,3 +327,61 @@ Claude / Orchestrator
   For an interview, the easiest way to remember the distinction is:
 
   Instructions = rules. Skills = procedures. Tools = capabilities. Memory/state = progress and context.
+
+
+  CLAUDE-AGENT/
+  │
+  ├── CLAUDE.md
+  │   ├── Main Claude instructions
+  │   ├── Defines agent behavior
+  │   ├── Routing rules
+  │   └── Security / guardrails
+  │
+  ├── config/
+  │   ├── settings.json
+  │   └── tools.json
+  │
+  ├── skills/
+  │   │
+  │   ├── coverage-check/
+  │   │   └── SKILL.md
+  │   │       ├── How to check member coverage
+  │   │       ├── Call Coverage API
+  │   │       └── Never determine coverage using RAG
+  │   │
+  │   ├── pharmacy-search/
+  │   │   └── SKILL.md
+  │   │       ├── Find nearby pharmacies
+  │   │       ├── Filter in-network / preferred
+  │   │       └── Call Pricing API
+  │   │
+  │   └── policy-explanation/
+  │       └── SKILL.md
+  │           ├── Search approved policies
+  │           ├── Use Bedrock Knowledge Base / RAG
+  │           └── Generate grounded explanation
+  │
+  ├── tools/
+  │   ├── coverage-api.md
+  │   ├── pricing-api.md
+  │   ├── pharmacy-api.md
+  │   ├── rules-engine.md
+  │   └── knowledge-base.md
+  │
+  ├── memory/
+  │   ├── state.json
+  │   │   ├── Current workflow state
+  │   │   ├── Completed steps
+  │   │   └── Tool results
+  │   │
+  │   └── memory.md
+  │       └── Approved persistent context
+  │
+  ├── workflows/
+  │   ├── pharmacy-assistant.md
+  │   └── error-handling.md
+  │
+  └── tests/
+      ├── tool-tests
+      ├── skill-tests
+      └── workflow-tests
