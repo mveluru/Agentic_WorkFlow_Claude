@@ -110,3 +110,51 @@ Claude Code
               │
               └── Quality Gates
                     └── Evidence before proceeding
+
+              INTENT
+                 │
+                 │ "Prevent duplicate payments"
+                 ▼
+              REQUIREMENTS
+                 │
+                 ├── POST /payments
+                 ├── Idempotency key required
+                 ├── Existing payment service
+                 └── Existing DB
+                 ▼
+              ARCHITECTURE / DESIGN
+                 │
+                 ├── Controller
+                 ├── PaymentService
+                 ├── Repository
+                 └── Idempotency mechanism
+                 ▼
+              PLAN
+                 │
+                 ├── Files to modify
+                 ├── Tests required
+                 └── Failure scenarios
+                 ▼
+              CONSTRUCTION
+                 │
+                 ├── Write failing duplicate-payment test
+                 │
+                 │         RED ❌
+                 │
+                 ├── Implement minimum solution
+                 │
+                 │         GREEN ✅
+                 │
+                 └── Refactor
+                 ▼
+              VERIFICATION
+                 │
+                 ├── Unit tests
+                 ├── Integration tests
+                 ├── Checkstyle
+                 ├── SpotBugs
+                 └── Security review
+                 ▼
+              DEPLOY
+                 ▼
+              OBSERVE
