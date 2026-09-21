@@ -34,3 +34,10 @@ Claude Code
           ├── Subagent Development
           ├── Code Review
           └── Verification Before Completion
+
+          Plugins
+            Skills
+            Agents
+            Hooks
+            MCP Servers
+            claude-plugin/plugin.json
