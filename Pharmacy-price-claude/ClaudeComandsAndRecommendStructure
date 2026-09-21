@@ -11,3 +11,26 @@ Context     control what it know now
 /btw        side question, leave no trace
 
 https://code.claude.com/docs/en/claude-directory
+https://plugins.jetbrains.com/plugin/27310-claude-code-beta-
+
+Superpowers plugin
+Claude Code
+    │
+    ├── CLAUDE.md
+    │     └── Your project-specific instructions
+    │
+    ├── .claude/rules/
+    │     └── Your scoped project rules
+    │
+    ├── Your Skills
+    │     └── Spring-specific workflows
+    │
+    └── Superpowers Plugin
+          │
+          ├── Brainstorming
+          ├── Writing Plans
+          ├── TDD
+          ├── Systematic Debugging
+          ├── Subagent Development
+          ├── Code Review
+          └── Verification Before Completion
