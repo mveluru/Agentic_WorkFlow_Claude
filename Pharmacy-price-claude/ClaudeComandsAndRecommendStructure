@@ -41,3 +41,72 @@ Claude Code
             Hooks
             MCP Servers
             claude-plugin/plugin.json
+
+                            AI-DLC
+
+           Business Requirement
+                   │
+                   ▼
+           ┌─────────────────────┐
+           │  1. IDEATION        │
+           │                     │
+           │ Understand problem  │
+           │ Clarify requirements│
+           │ Define scope        │
+           └──────────┬──────────┘
+                      ▼
+           ┌─────────────────────┐
+           │  2. INCEPTION       │
+           │                     │
+           │ Requirements        │
+           │ Architecture        │
+           │ Technical design    │
+           │ Implementation plan │
+           └──────────┬──────────┘
+                      ▼
+           ┌─────────────────────┐
+           │  3. CONSTRUCTION    │
+           │                     │
+           │ Write tests         │
+           │ Write Java code     │
+           │ TDD                 │
+           │ Code review         │
+           │ Security checks     │
+           └──────────┬──────────┘
+                      ▼
+           ┌─────────────────────┐
+           │  4. OPERATIONS      │
+           │                     │
+           │ Deploy              │
+           │ Observe             │
+           │ Debug               │
+           │ Optimize            │
+           └──────────┬──────────┘
+                      │
+                      └──────► Feedback / next change
+
+            AI-DLC
+              │
+              ├── CLAUDE.md
+              │     └── Persistent engineering standards
+              │
+              ├── Rules
+              │     └── Scoped constraints
+              │
+              ├── Skills
+              │     └── Reusable engineering procedures
+              │
+              ├── Plan / Design
+              │     └── Understand before implementation
+              │
+              ├── Agents / Subagents
+              │     └── Perform specialized work
+              │
+              ├── TDD
+              │     └── RED → GREEN → REFACTOR
+              │
+              ├── Hooks / Automation
+              │     └── Deterministic checks
+              │
+              └── Quality Gates
+                    └── Evidence before proceeding
